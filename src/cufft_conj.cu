@@ -48,15 +48,18 @@ void cufft_conj(void *d_data,
                   (ny-1)/blockSize.y+1,
                   (nz-1)/blockSize.z+1);
 
+    cudaStream_t stream_id;
+    (stream == NULL) ? stream_id = NULL : stream_id = *stream;
+
     switch(dtype) {
 
         case 2: {
-            complex_conj<<<gridSize,blockSize,0,*stream>>>((float2*)d_data,nx,ny,nz);
+            complex_conj<<<gridSize,blockSize,0,stream_id>>>((float2*)d_data,nx,ny,nz);
             break;
         }
 
         case 3: {
-            complex_conj<<<gridSize,blockSize,0,*stream>>>((double2*)d_data,nx,ny,nz);
+            complex_conj<<<gridSize,blockSize,0,stream_id>>>((double2*)d_data,nx,ny,nz);
             break;
         }
     }

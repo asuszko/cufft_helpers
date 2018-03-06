@@ -14,31 +14,31 @@ __global__ void k_makeRedundant(T* dst, const T* src, int w, int h)
     volatile int gid_y = threadIdx.y + blockIdx.y * blockDim.y;
     volatile int nbNoRedundants = (w >> 1) + 1;
 
-	  // index for reading :
-	  volatile int gid = gid_x + nbNoRedundants * gid_y;
-  	T val;
+    // index for reading :
+    volatile int gid = gid_x + nbNoRedundants * gid_y;
+    T val;
 
-	  if(gid_x < nbNoRedundants && gid_y < h) {
-	      // write the non redundant part in the new array :
-	      val = src[gid];
-		    gid = gid_x + w * gid_y; // new index for writing
-		    dst[gid] = val;
-	  }
+    if(gid_x < nbNoRedundants && gid_y < h) {
+        // write the non redundant part in the new array :
+        val = src[gid];
+        gid = gid_x + w * gid_y; // new index for writing
+        dst[gid] = val;
+    }
 
-	  // shift'n'flip
-	  gid_x = w - gid_x;
+    // shift'n'flip
+    gid_x = w - gid_x;
 
     if(gid_y != 0) {
         gid_y = h - gid_y;
     }
 
-	  gid = gid_x + w * gid_y;
+    gid = gid_x + w * gid_y;
 
-	  // write conjugate :
+    // write conjugate :
 
-	  if(gid_x >= nbNoRedundants && gid_x < w && gid_y >= 0 && gid_y < h) {
-		    val.y = -val.y;
-		    dst[gid] = val; // never coalesced with compute <= 1.1 ; coalesced if >= 1.2 AND w multiple of 16 AND good call configuration
+    if(gid_x >= nbNoRedundants && gid_x < w && gid_y >= 0 && gid_y < h) {
+        val.y = -val.y;
+        dst[gid] = val; // never coalesced with compute <= 1.1 ; coalesced if >= 1.2 AND w multiple of 16 AND good call configuration
     }
 }
 
