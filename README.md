@@ -15,7 +15,7 @@ For reference to official Nvidia documentation:
 To compile the shared library, run the **setup.py** file found in the root folder from the command line, with optional argument(s) -arch, and -cc_bin if on Windows. On Windows, the NVCC compiler looks for cl.exe to compile the C/C++, which comes with Visual Studio. On Linux, it uses the built in GCC compiler. An example of a command line run to compile the code is given below:
 > python setup.py -arch=sm_50 -cc_bin="C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin"
 
-If you are unable to compile, you may download precompiled libraries for your latest hardware supported shader architecture. 
+If you are unable to compile, you may [download precompiled libraries here](https://github.com/asuszko/cuda_manager_libs).
 
 ## Compiler Requirements
 
@@ -42,7 +42,7 @@ For sample scripts or further documentation on how to use this framework, view [
  
 The MIT License (MIT)
 
-Copyright (c) 2018 Arthur Suszko <art.suszko@gmail.com>
+Copyright (c) 2018 Arthur Suszko (art.suszko@gmail.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
