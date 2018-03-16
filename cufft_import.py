@@ -10,16 +10,12 @@ __all__ = [
 ]
 
 import os
-import sys
-from numpy.ctypeslib import load_library, ndpointer
-from ctypes import (c_bool,
-                    c_int,
-                    c_void_p,
-                    c_size_t)
+from numpy.ctypeslib import ndpointer
+from ctypes import (c_int,
+                    c_void_p)
 
 # Load the shared library
-sys.path.append("..")
-from shared_utils.load_lib import load_lib
+from shared_utils import load_lib
 lib_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "lib"))
 cufft_lib = load_lib(lib_path,"cufft")
 

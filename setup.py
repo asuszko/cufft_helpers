@@ -9,7 +9,7 @@ import os
 import sys
 
 sys.path.append("..")
-from shared_utils.build import build
+from shared_utils import build
 
 __lib_name = "cufft"
 
