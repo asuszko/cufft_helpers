@@ -15,10 +15,11 @@ from cufft_import import (cufft_addredundants,
                           cufft_r2c,
                           cufft_setstream)
 
-_type2id_types = {np.dtype('f4'):0,
-                  np.dtype('f8'):1,
-                  np.dtype('c8'):2,
-                  np.dtype('c16'):3}
+# Datatype identifier. cuBLAS currently supports these.
+_cufft_types = {np.dtype('f4'):0,
+                np.dtype('f8'):1,
+                np.dtype('c8'):2,
+                np.dtype('c16'):3}
 
 _cufft_type_map = {
     "CUFFT_R2C": 0,  # single precision, real -> complex
@@ -77,13 +78,16 @@ class cufft(object):
         
         # Get the fft_type
         cufft_type = _cufft_type_map[fft_type.upper()]
+        
+        if type(extent) in [list,tuple]:
+            extent = np.array(extent, dtype='i4')
             
         # Create the plan and return the pointer to the plan            
         plan_ptr = cufft_plan(extent, cufft_type, batch_size)
 
         if self.stream is not None:
             cufft_setstream(plan_ptr, self.stream)
-            
+        
         return {'ptr': plan_ptr,
                 'plan_id': _cufft_dtype_map[fft_type.upper()],
                 'extent': extent}
@@ -101,20 +105,20 @@ class cufft(object):
         plan : dict
             A dict containing the plan information.
             
-        idata : c_void_p
-            Device pointer to the non-redundant input data.
+        idata : Device_Ptr object
+            Device pointer object to the non-redundant input data.
             
-        odata: c_void_p
-            Device pointer to the output data with redundants.
+        odata: Device_Ptr object
+            Device pointer object to the output data with redundants.
         """
-        cufft_addredundants(idata, odata,
+        cufft_addredundants(idata.ptr, odata.ptr,
                             plan['extent'][0], 
                             plan['extent'][1],
                             plan['plan_id'],
                             self.stream)
         
 
-    def c2c(self, plan, idata, odata, fft_dir):
+    def c2c(self, plan, x, y, fft_dir):
         """
         Executes a complex-to-complex transform plan in the 
         transform direction as specified by direction parameter. 
@@ -128,11 +132,11 @@ class cufft(object):
         plan : dict
             A dict containing the plan information.
             
-        idata : c_void_p
-            Device pointer to the complex input data.
+        x : Device_Ptr object
+            Device pointer object with dev_ptr to complex vector x.
             
-        odata : c_void_p
-            Device pointer to the complex output data.
+        y : Device_Ptr object
+            Device pointer object with dev_ptr to complex vector y.
             
         fft_dir : int or str
             The transform direction: 'CUFFT_FORWARD' or 'CUFFT_INVERSE'.
@@ -141,10 +145,10 @@ class cufft(object):
             cufft_dir = _cufft_dir_map[fft_dir.upper()]
         else:
             cufft_dir = fft_dir
-        cufft_c2c(plan['ptr'], idata, odata, cufft_dir, plan['plan_id'])
+        cufft_c2c(plan['ptr'], x.ptr, y.ptr, cufft_dir, plan['plan_id'])
 
 
-    def c2r(self, plan, idata, odata):
+    def c2r(self, plan, x, y):
         """
         Executes a complex-to-real, implicitly inverse, cuFFT transform 
         plan. cuFFT uses as input data the GPU memory pointed to by 
@@ -158,16 +162,16 @@ class cufft(object):
         plan : dict
             A dict containing the plan information.
             
-        idata : c_void_p
-            Device pointer to the complex input data.
+        x : Device_Ptr object
+            Device pointer object with dev_ptr to complex vector x.
             
-        odata : c_void_p
-            Device pointer to the real output data.
+        y : Device_Ptr object
+            Device pointer object with dev_ptr to real vector y.
         """
-        cufft_c2r(plan['ptr'], idata, odata, plan['plan_id'])
+        cufft_c2r(plan['ptr'], x.ptr, y.ptr, plan['plan_id'])
 
 
-    def r2c(self, plan, idata, odata):
+    def r2c(self, plan, x, y):
         """
         Executes a real-to-complex, implicitly forward, cuFFT transform 
         plan. cuFFT uses as input data the GPU memory pointed to by 
@@ -180,40 +184,32 @@ class cufft(object):
         plan : dict
             A dict containing the plan information.
             
-        idata : c_void_p
-            Device pointer to the real input data.
+        x : Device_Ptr object
+            Device pointer object with dev_ptr to real vector x.
             
-        odata : c_void_p
-            Device pointer to the complex output data.
+        y : Device_Ptr object
+            Device pointer object with dev_ptr to complex vector y.
         """
-        cufft_r2c(plan['ptr'], idata, odata, plan['plan_id'])
+        cufft_r2c(plan['ptr'], x.ptr, y.ptr, plan['plan_id'])
 
 
-    def complex_conj(self, data, extent, dtype_id):
+    def complex_conj(self, x, extent):
         """
         Turns a device array into its complex conjugate.
         
         Parameters
         ----------
-        data : c_void_p
-            Device pointer to complex data.
+        x : Device_Ptr object
+            Device pointer object with dev_ptr to vector x.
             
         extent : list or np.ndarray (1d)
             Dimensions of the data array.
-            
-        dtype_id : int or np.dtype
-            Data type identifier
         """
-        if dtype_id is np.ndarray:
-            dtype_id = self.types[dtype_id]
-        cufft_conj(data, extent, dtype_id, self.stream)
+        if type(extent) in [list,tuple]:
+            extent = np.array(extent, dtype='i4')
+        cufft_conj(x.ptr, extent, _cufft_types[x.dtype], self.stream)
         
 
     @property
     def stream(self):
         return self._stream
-        
-        
-    @property
-    def types(self):
-        return _type2id_types
