@@ -16,21 +16,28 @@ cufftHandle *cufft_plan(planlen extent,
                         int fft_type,
                         int batch_size)
 {
-	  cufftHandle *plan = (cufftHandle *)malloc(sizeof(cufftHandle));
+	cufftHandle *plan = new cufftHandle;
 
     int ndims = 0;
     (extent[0] > 1) ? ndims += 1 : false;
     (extent[1] > 1) ? ndims += 1 : false;
     (extent[2] > 1) ? ndims += 1 : false;
 
-    int *dims = (int *)malloc(sizeof(int)*ndims);
+    int *dims = new int[ndims];
     for (int i = 0; i < ndims; ++i) {
         dims[i] = extent[ndims-i-1];
     }
 
     gpuFFTErrchk(cufftPlanMany(plan, ndims, dims, NULL, 0, 0, NULL, 0, 0, CUFFTTYPE(fft_type), batch_size));
     cudaDeviceSynchronize();
-    free(dims);
+    delete[] dims;
 
     return plan;
+}
+
+
+void cufft_plan_destroy(cufftHandle *plan)
+{
+    gpuFFTErrchk(cufftDestroy(*plan));
+    delete[] plan;
 }

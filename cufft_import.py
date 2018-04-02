@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 __all__ = [
-    "cufft_conj",
     "cufft_c2c",
     "cufft_c2r",
     "cufft_plan",
@@ -47,16 +46,12 @@ argtype_defs = {
                    c_void_p,                #Device pointer to the input data
                    c_void_p,                #Device pointer to non-redundant data
                    c_int],                  #Data type identifier
-
-    "cufft_conj" : [c_void_p,               #Device pointer to the input data
-                    ndpointer(),            #Dimensions of the input data
-                    c_int,                  #Data type identifier
-                    c_void_p],              #Pointer to CUDA stream
                     
                     
     "cufft_plan" : [ndpointer(),            #Dimensions of the fft
                     c_int,                  #Type of fft
                     c_int],                 #Batch size of fft
+
                     
     "cufft_setstream" : [c_void_p,          #Pointer to the cuFFT plan
                          c_void_p]          #Pointer to CUDA stream

@@ -10,7 +10,6 @@ import numpy as np
 from cufft_import import (cufft_addredundants,
                           cufft_c2c,
                           cufft_c2r,
-                          cufft_conj,
                           cufft_plan,
                           cufft_r2c,
                           cufft_setstream)
@@ -191,23 +190,6 @@ class cufft(object):
             Device pointer object with dev_ptr to complex vector y.
         """
         cufft_r2c(plan['ptr'], x.ptr, y.ptr, plan['plan_id'])
-
-
-    def complex_conj(self, x, extent):
-        """
-        Turns a device array into its complex conjugate.
-        
-        Parameters
-        ----------
-        x : Device_Ptr object
-            Device pointer object with dev_ptr to vector x.
-            
-        extent : list or np.ndarray (1d)
-            Dimensions of the data array.
-        """
-        if type(extent) in [list,tuple]:
-            extent = np.array(extent, dtype='i4')
-        cufft_conj(x.ptr, extent, _cufft_types[x.dtype], self.stream)
         
 
     @property

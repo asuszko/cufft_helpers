@@ -11,9 +11,11 @@ typedef int planlen[3];
 
 extern "C" {
 
-  cufftHandle DLL_EXPORT *cufft_plan(planlen extent,
-                                     int fft_type,
-                                     int batch_size=1);
+    cufftHandle DLL_EXPORT *cufft_plan(planlen extent,
+                                       int fft_type,
+                                       int batch_size=1);
+
+    void DLL_EXPORT cufft_plan_destroy(cufftHandle *plan);
 }
 
 

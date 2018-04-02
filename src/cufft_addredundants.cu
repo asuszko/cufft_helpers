@@ -8,7 +8,7 @@ CUDA R2C transformation. This function was found here:
 https://devtalk.nvidia.com/default/topic/488433/cufft-only-gives-non-redundant-results/
 */
 template<typename T>
-__global__ void k_makeRedundant(T* dst, const T* src, int w, int h)
+__global__ void k_makeRedundant(T* __restrict__ dst, const T* __restrict__ src, int w, int h)
 {
     volatile int gid_x = threadIdx.x + blockIdx.x * blockDim.x;
     volatile int gid_y = threadIdx.y + blockIdx.y * blockDim.y;
@@ -45,7 +45,7 @@ __global__ void k_makeRedundant(T* dst, const T* src, int w, int h)
 
 /* C compatible version that requires a dtype_id to be converted
 to the proper data type. */
-void cufft_addredundants(const void *d_idata,
+void cufft_addredundants(void *d_idata,
                          void *d_odata,
                          int nx, int ny,
                          int dtype,
@@ -60,19 +60,17 @@ void cufft_addredundants(const void *d_idata,
 
     switch(dtype) {
 
-        case 2: {
-            k_makeRedundant<<<gridSize, blockSize, 0, stream_id>>>((float2*)d_odata,
-                                                                   (float2*)d_idata,
+        case 2:
+            k_makeRedundant<<<gridSize, blockSize, 0, stream_id>>>(static_cast<float2*>(d_odata),
+                                                                   static_cast<const float2*>(d_idata),
                                                                    nx, ny);
             break;
-        }
 
-        case 3: {
-            k_makeRedundant<<<gridSize, blockSize, 0, stream_id>>>((double2*)d_odata,
-                                                                   (double2*)d_idata,
+        case 3:
+            k_makeRedundant<<<gridSize, blockSize, 0, stream_id>>>(static_cast<double2*>(d_odata),
+                                                                   static_cast<const double2*>(d_idata),
                                                                    nx, ny);
             break;
-        }
     }
 
     return;

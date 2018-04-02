@@ -10,16 +10,10 @@
 extern "C" {
 
   void DLL_EXPORT cufft_r2c(cufftHandle *plan,
-                            const void *d_idata,
+                            void *d_idata,
                             void *d_odata,
                             int dtype);
 }
-
-
-template<typename T>
-inline cufftResult_t cufftTR2C(cufftHandle *plan,
-                               const T *idata,
-                               void *odata);
 
 
 #endif /* ifndef CUFFT_R2C_H */

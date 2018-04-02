@@ -9,7 +9,7 @@
 
 extern "C" {
 
-  void DLL_EXPORT cufft_addredundants(const void *d_idata,
+  void DLL_EXPORT cufft_addredundants(void *d_idata,
                                       void *d_odata,
                                       int nx, int ny,
                                       int dtype,
