@@ -1,7 +1,6 @@
 *~
 
 # Directories #
-lib/
 
 
 # Datasets #
@@ -20,9 +19,6 @@ lib/
 
 # Compiled source #
 ###################
-*.so
-*.lib
-*.dll
 *.exp
 *.exe
 *.out
